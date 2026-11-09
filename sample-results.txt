@@ -1,0 +1,24 @@
+
+1. Residents of Household 1
+resident
+Alex
+Mia
+Sam
+
+2. Overdue pending chores as of November 5, 2026
+title | assignee | due_date
+Take out trash | Mia | 2026-11-03
+
+3. Pending chores per resident, including zero
+resident | pending_chores
+Alex | 0
+Mia | 1
+Sam | 1
+
+4. Jordan's open maintenance requests
+property | unit_label | description
+Cypress Apartments | 2A | Leaking kitchen sink
+
+5. Taylor's open RA concerns
+property | unit_label | description
+Cypress Apartments | 2A | Roommate conflict over quiet hours
