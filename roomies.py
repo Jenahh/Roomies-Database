@@ -5,7 +5,7 @@ from pathlib import Path
 import sqlite3
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_DB = ROOT / "roomies.sqlite3"
+DEFAULT_DB = ROOT / "roomies-database.sqlite3"
 
 
 def connect(path):
