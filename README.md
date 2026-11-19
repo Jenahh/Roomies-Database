@@ -3,14 +3,15 @@ CSC 4402
 
 Roomies is a SQLite database and a command-line demo for shared households.
 
-It supports chores, maintenance requests, and concerns shared with resident assistants.
+It supports chores, maintenance requests, concerns shared with resident assistants,
+shared expenses, household announcements, request status history, and leases.
 
 ## Run the project
 
 Install Python 3.8 or later. The project uses the Python standard library.
 Extract the ZIP and open a terminal in the Roomies folder.
 
-1. Run the five report queries against the included database.
+1. Run the eleven report queries against the included database.
 
    ```text
    python roomies.py test
@@ -64,9 +65,9 @@ household's assigned RA.
 
 ## Files
 
-- `roomies.sqlite3` contains the nine tables and synthetic sample data.
+- `roomies-database.sqlite3` contains the fourteen tables and synthetic sample data.
 - `schema.sql` creates the database tables and constraints.
 - `seed.sql` inserts the synthetic sample data.
-- `queries.sql` contains the five executable report queries.
+- `queries.sql` contains the eleven executable report queries.
 - `sample-results.txt` contains the actual output from the fresh seed database.
 - `roomies.py` initializes the database, runs the queries, and opens the CLI.
