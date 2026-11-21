@@ -48,7 +48,7 @@ resident | property | unit_label | end_date
 Riley | Oak Commons | 3B | 2026-12-15
 Mia | Cypress Apartments | 2A | 2026-12-31
 
-11. Total monthly rent per unit
+11. Active monthly rent per unit as of November 19, 2026
 property | unit_label | residents | total_rent
 Cypress Apartments | 2A | 3 | 1900.0
 Oak Commons | 3B | 1 | 700.0

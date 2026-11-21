@@ -1,0 +1,13 @@
+LIVE HTTP -> SQLITE VERIFICATION (temporary database)
+1. Existing web chore contract: POST /api/households/1/chores
+   SQLite Chore: (6, 'Synchronization demo', 'Pending')
+   Mia GET sees Completed: True
+2. Staff changes request 1 to In Progress
+   SQLite RequestUpdate: (1, 'In Progress', 10)
+3. Household add/delete through the expanded API (also used by CLI)
+   After INSERT: SQLite matching households = 1
+   After DELETE: SQLite matching households = 0
+4. Expense add/delete and dependent shares
+   SQLite shares: 3.34 + 3.33 + 3.33 = 10.00
+   After DELETE: expense absent; dependent shares = 0
+PASS: persisted writes, shared reads, atomic history, deletes, cascade, foreign keys.

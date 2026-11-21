@@ -80,11 +80,12 @@ JOIN Property AS p ON p.property_id = h.property_id
 WHERE l.end_date BETWEEN '2026-11-19' AND date('2026-11-19', '+60 days')
 ORDER BY l.end_date;
 
--- 11. Total monthly rent per unit
-SELECT p.name AS property, h.unit_label, COUNT(*) AS residents,
+-- 11. Active monthly rent per unit as of November 19, 2026
+SELECT p.name AS property, h.unit_label, COUNT(DISTINCT l.user_id) AS residents,
     SUM(l.monthly_rent) AS total_rent
 FROM Lease AS l
 JOIN Household AS h ON h.household_id = l.household_id
 JOIN Property AS p ON p.property_id = h.property_id
+WHERE l.start_date <= '2026-11-19' AND l.end_date >= '2026-11-19'
 GROUP BY h.household_id, p.name, h.unit_label
 ORDER BY p.name, h.unit_label;

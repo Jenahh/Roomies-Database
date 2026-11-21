@@ -65,18 +65,22 @@ CREATE TABLE Expense (
     household_id INTEGER NOT NULL REFERENCES Household(household_id),
     paid_by_user_id INTEGER NOT NULL,
     description TEXT NOT NULL CHECK (length(trim(description)) > 0),
-    amount REAL NOT NULL CHECK (amount > 0),
+    amount REAL NOT NULL CHECK (amount > 0 AND abs(amount*100-round(amount*100)) < 0.00001),
     expense_date TEXT NOT NULL CHECK (date(expense_date, '+0 days') IS expense_date),
+    UNIQUE (expense_id, household_id),
     FOREIGN KEY (household_id, paid_by_user_id)
         REFERENCES HouseholdMember(household_id, user_id)
 );
 
 CREATE TABLE ExpenseShare (
-    expense_id INTEGER NOT NULL REFERENCES Expense(expense_id) ON DELETE CASCADE,
+    expense_id INTEGER NOT NULL,
+    household_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL REFERENCES Resident(user_id),
-    share_amount REAL NOT NULL CHECK (share_amount >= 0),
+    share_amount REAL NOT NULL CHECK (share_amount >= 0 AND abs(share_amount*100-round(share_amount*100)) < 0.00001),
     is_paid INTEGER NOT NULL DEFAULT 0 CHECK (is_paid IN (0, 1)),
-    PRIMARY KEY (expense_id, user_id)
+    PRIMARY KEY (expense_id, user_id),
+    FOREIGN KEY (expense_id, household_id) REFERENCES Expense(expense_id, household_id) ON DELETE CASCADE,
+    FOREIGN KEY (household_id, user_id) REFERENCES HouseholdMember(household_id, user_id)
 );
 
 CREATE TABLE Announcement (
@@ -85,7 +89,7 @@ CREATE TABLE Announcement (
     posted_by_user_id INTEGER NOT NULL REFERENCES "User"(user_id),
     title TEXT NOT NULL CHECK (length(trim(title)) > 0),
     body TEXT NOT NULL CHECK (length(trim(body)) > 0),
-    posted_at TEXT NOT NULL CHECK (date(posted_at, '+0 days') IS posted_at)
+    posted_at TEXT NOT NULL CHECK (datetime(posted_at) IS NOT NULL)
 );
 
 CREATE TABLE RequestUpdate (
@@ -94,7 +98,7 @@ CREATE TABLE RequestUpdate (
     updated_by_user_id INTEGER NOT NULL REFERENCES "User"(user_id),
     new_status TEXT NOT NULL CHECK (new_status IN ('Open', 'In Progress', 'Closed')),
     note TEXT,
-    updated_at TEXT NOT NULL CHECK (date(updated_at, '+0 days') IS updated_at)
+    updated_at TEXT NOT NULL CHECK (datetime(updated_at) IS NOT NULL)
 );
 
 CREATE TABLE Lease (
@@ -103,8 +107,23 @@ CREATE TABLE Lease (
     user_id INTEGER NOT NULL,
     start_date TEXT NOT NULL CHECK (date(start_date, '+0 days') IS start_date),
     end_date TEXT NOT NULL CHECK (date(end_date, '+0 days') IS end_date),
-    monthly_rent REAL NOT NULL CHECK (monthly_rent > 0),
+    monthly_rent REAL NOT NULL CHECK (monthly_rent > 0 AND abs(monthly_rent*100-round(monthly_rent*100)) < 0.00001),
     CHECK (end_date > start_date),
     FOREIGN KEY (household_id, user_id)
         REFERENCES HouseholdMember(household_id, user_id)
 );
+
+CREATE TABLE ChoreDisplay (
+ chore_id INTEGER PRIMARY KEY REFERENCES Chore(chore_id) ON DELETE CASCADE,
+ minutes INTEGER, look TEXT
+);
+
+CREATE TRIGGER lease_no_overlap_insert BEFORE INSERT ON Lease
+WHEN EXISTS (SELECT 1 FROM Lease l WHERE l.household_id=NEW.household_id AND l.user_id=NEW.user_id
+ AND l.lease_id<>COALESCE(NEW.lease_id,-1) AND l.start_date<=NEW.end_date AND l.end_date>=NEW.start_date)
+BEGIN SELECT RAISE(ABORT,'Overlapping leases for the same household resident'); END;
+
+CREATE TRIGGER lease_no_overlap_update BEFORE UPDATE ON Lease
+WHEN EXISTS (SELECT 1 FROM Lease l WHERE l.household_id=NEW.household_id AND l.user_id=NEW.user_id
+ AND l.lease_id<>COALESCE(NEW.lease_id,-1) AND l.start_date<=NEW.end_date AND l.end_date>=NEW.start_date)
+BEGIN SELECT RAISE(ABORT,'Overlapping leases for the same household resident'); END;

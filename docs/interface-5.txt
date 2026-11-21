@@ -1,0 +1,21 @@
+Demo email (e.g. alex@example.com or jordan@example.com):
+households
+household_id | property | unit_label | ra_user_id
+1 | Cypress Apartments | 2A | 11
+
+properties
+property_id | name
+1 | Cypress Apartments
+
+1 Households/properties  2 Add household (manager)  3 Delete EMPTY household (manager)
+4 Expenses  5 Announcements  6 Leases  7 Request history  Enter Quit
+Choose: Household ID:
+leases
+lease_id | resident | start_date | end_date | monthly_rent
+1 | Alex | 2026-08-01 | 2027-05-31 | 650.0
+2 | Mia | 2026-08-01 | 2026-12-31 | 650.0
+3 | Sam | 2026-08-01 | 2027-05-31 | 600.0
+Enter View only | a Add | d Delete:
+1 Households/properties  2 Add household (manager)  3 Delete EMPTY household (manager)
+4 Expenses  5 Announcements  6 Leases  7 Request history  Enter Quit
+Choose:

@@ -30,10 +30,10 @@ INSERT INTO Expense VALUES
     (2, 1, 2, 'Groceries', 45.00, '2026-11-04'),
     (3, 2, 4, 'Cleaning supplies', 18.50, '2026-11-02');
 
-INSERT INTO ExpenseShare VALUES
-    (1, 1, 20.00, 1), (1, 2, 20.00, 0), (1, 3, 20.00, 0),
-    (2, 1, 15.00, 1), (2, 2, 15.00, 1), (2, 3, 15.00, 0),
-    (3, 4, 18.50, 1);
+INSERT INTO ExpenseShare(expense_id, household_id, user_id, share_amount, is_paid) VALUES
+    (1, 1, 1, 20.00, 1), (1, 1, 2, 20.00, 0), (1, 1, 3, 20.00, 0),
+    (2, 1, 1, 15.00, 1), (2, 1, 2, 15.00, 1), (2, 1, 3, 15.00, 0),
+    (3, 2, 4, 18.50, 1);
 
 INSERT INTO Announcement VALUES
     (1, 1, 1, 'Quiet hours', 'Please keep it quiet after 11 pm on weeknights.', '2026-11-02'),
@@ -41,7 +41,7 @@ INSERT INTO Announcement VALUES
     (3, 2, 13, 'Floor meeting', 'Floor meeting Monday at 7 pm in the lounge.', '2026-11-05');
 
 INSERT INTO RequestUpdate VALUES
-    (1, 1, 10, 'In Progress', 'Plumber scheduled for Friday', '2026-11-05'),
+    (1, 1, 10, 'Open', 'Maintenance request received', '2026-11-05'),
     (2, 5, 10, 'In Progress', 'Bulb ordered', '2026-11-01'),
     (3, 5, 10, 'Closed', 'Bulb replaced', '2026-11-03');
 

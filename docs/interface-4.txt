@@ -1,0 +1,19 @@
+Demo email (e.g. alex@example.com or jordan@example.com):
+households
+household_id | property | unit_label | ra_user_id
+1 | Cypress Apartments | 2A | 11
+
+properties
+(none)
+
+1 Households/properties  2 Add household (manager)  3 Delete EMPTY household (manager)
+4 Expenses  5 Announcements  6 Leases  7 Request history  Enter Quit
+Choose: Household ID:
+announcements
+announcement_id | author | title | body
+2 | Taylor | Fire drill | Building fire drill this Friday at 3 pm.
+1 | Alex | Quiet hours | Please keep it quiet after 11 pm on weeknights.
+Enter View only | a Add | d Delete:
+1 Households/properties  2 Add household (manager)  3 Delete EMPTY household (manager)
+4 Expenses  5 Announcements  6 Leases  7 Request history  Enter Quit
+Choose:
