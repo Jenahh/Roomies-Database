@@ -1,0 +1,8 @@
+SELECT request_id,description,status FROM Request WHERE request_id IN (1,2) ORDER BY request_id;
+request_id | description | status
+1 | Leaking kitchen sink | In Progress
+2 | Roommate conflict over quiet hours | Closed
+
+RequestUpdate: request_id | updated_by_user_id | new_status
+1 | 10 | In Progress
+2 | 11 | Closed

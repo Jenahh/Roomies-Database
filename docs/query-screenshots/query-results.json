@@ -1,0 +1,244 @@
+[
+  {
+    "number": 1,
+    "title": "1. Residents of Household 1",
+    "sql": "SELECT u.name AS resident\nFROM HouseholdMember AS hm\nJOIN \"User\" AS u ON u.user_id = hm.user_id\nWHERE hm.household_id = 1\nORDER BY u.name;",
+    "columns": [
+      "resident"
+    ],
+    "rows": [
+      [
+        "Alex"
+      ],
+      [
+        "Mia"
+      ],
+      [
+        "Sam"
+      ]
+    ],
+    "screenshot": "query-01.png"
+  },
+  {
+    "number": 2,
+    "title": "2. Overdue pending chores as of November 5, 2026",
+    "sql": "SELECT c.title, COALESCE(u.name, 'Unassigned') AS assignee, c.due_date\nFROM Chore AS c\nLEFT JOIN \"User\" AS u ON u.user_id = c.assigned_user_id\nWHERE c.household_id = 1 AND c.status = 'Pending' AND c.due_date < '2026-11-05'\nORDER BY c.due_date, c.chore_id;",
+    "columns": [
+      "title",
+      "assignee",
+      "due_date"
+    ],
+    "rows": [
+      [
+        "Take out trash",
+        "Mia",
+        "2026-11-03"
+      ]
+    ],
+    "screenshot": "query-02.png"
+  },
+  {
+    "number": 3,
+    "title": "3. Pending chores per resident, including zero",
+    "sql": "SELECT u.name AS resident, COUNT(c.chore_id) AS pending_chores\nFROM HouseholdMember AS hm\nJOIN \"User\" AS u ON u.user_id = hm.user_id\nLEFT JOIN Chore AS c ON c.household_id = hm.household_id\n    AND c.assigned_user_id = hm.user_id AND c.status = 'Pending'\nWHERE hm.household_id = 1\nGROUP BY u.user_id, u.name\nORDER BY u.name;",
+    "columns": [
+      "resident",
+      "pending_chores"
+    ],
+    "rows": [
+      [
+        "Alex",
+        0
+      ],
+      [
+        "Mia",
+        1
+      ],
+      [
+        "Sam",
+        1
+      ]
+    ],
+    "screenshot": "query-03.png"
+  },
+  {
+    "number": 4,
+    "title": "4. Jordan's open maintenance requests",
+    "sql": "SELECT p.name AS property, h.unit_label, r.description\nFROM Request AS r\nJOIN Household AS h ON h.household_id = r.household_id\nJOIN Property AS p ON p.property_id = h.property_id\nWHERE p.manager_user_id = 10 AND r.request_type = 'Maintenance' AND r.status = 'Open'\nORDER BY p.name, h.unit_label, r.request_id;",
+    "columns": [
+      "property",
+      "unit_label",
+      "description"
+    ],
+    "rows": [
+      [
+        "Cypress Apartments",
+        "2A",
+        "Leaking kitchen sink"
+      ]
+    ],
+    "screenshot": "query-04.png"
+  },
+  {
+    "number": 5,
+    "title": "5. Taylor's open RA concerns",
+    "sql": "SELECT p.name AS property, h.unit_label, r.description\nFROM Request AS r\nJOIN Household AS h ON h.household_id = r.household_id\nJOIN Property AS p ON p.property_id = h.property_id\nWHERE h.ra_user_id = 11 AND r.request_type = 'RA Concern' AND r.status = 'Open'\nORDER BY p.name, h.unit_label, r.request_id;",
+    "columns": [
+      "property",
+      "unit_label",
+      "description"
+    ],
+    "rows": [
+      [
+        "Cypress Apartments",
+        "2A",
+        "Roommate conflict over quiet hours"
+      ]
+    ],
+    "screenshot": "query-05.png"
+  },
+  {
+    "number": 6,
+    "title": "6. Unpaid shares each resident owes in Household 1",
+    "sql": "SELECT u.name AS resident, SUM(es.share_amount) AS amount_owed\nFROM ExpenseShare AS es\nJOIN Expense AS e ON e.expense_id = es.expense_id\nJOIN \"User\" AS u ON u.user_id = es.user_id\nWHERE e.household_id = 1 AND es.is_paid = 0\n    AND es.user_id <> e.paid_by_user_id\nGROUP BY u.user_id, u.name\nORDER BY amount_owed DESC, u.name;",
+    "columns": [
+      "resident",
+      "amount_owed"
+    ],
+    "rows": [
+      [
+        "Sam",
+        35.0
+      ],
+      [
+        "Mia",
+        20.0
+      ]
+    ],
+    "screenshot": "query-06.png"
+  },
+  {
+    "number": 7,
+    "title": "7. Total household spending in November 2026",
+    "sql": "SELECT p.name AS property, h.unit_label, SUM(e.amount) AS total_spent\nFROM Expense AS e\nJOIN Household AS h ON h.household_id = e.household_id\nJOIN Property AS p ON p.property_id = h.property_id\nWHERE e.expense_date BETWEEN '2026-11-01' AND '2026-11-30'\nGROUP BY h.household_id, p.name, h.unit_label\nORDER BY total_spent DESC;",
+    "columns": [
+      "property",
+      "unit_label",
+      "total_spent"
+    ],
+    "rows": [
+      [
+        "Cypress Apartments",
+        "2A",
+        105.0
+      ],
+      [
+        "Oak Commons",
+        "3B",
+        18.5
+      ]
+    ],
+    "screenshot": "query-07.png"
+  },
+  {
+    "number": 8,
+    "title": "8. Announcements for Household 1, newest first",
+    "sql": "SELECT a.posted_at, u.name AS posted_by, a.title\nFROM Announcement AS a\nJOIN \"User\" AS u ON u.user_id = a.posted_by_user_id\nWHERE a.household_id = 1\nORDER BY a.posted_at DESC, a.announcement_id DESC;",
+    "columns": [
+      "posted_at",
+      "posted_by",
+      "title"
+    ],
+    "rows": [
+      [
+        "2026-11-06",
+        "Taylor",
+        "Fire drill"
+      ],
+      [
+        "2026-11-02",
+        "Alex",
+        "Quiet hours"
+      ]
+    ],
+    "screenshot": "query-08.png"
+  },
+  {
+    "number": 9,
+    "title": "9. Status history of the hallway light request",
+    "sql": "SELECT ru.updated_at, u.name AS updated_by, ru.new_status, ru.note\nFROM RequestUpdate AS ru\nJOIN \"User\" AS u ON u.user_id = ru.updated_by_user_id\nWHERE ru.request_id = 5\nORDER BY ru.updated_at, ru.update_id;",
+    "columns": [
+      "updated_at",
+      "updated_by",
+      "new_status",
+      "note"
+    ],
+    "rows": [
+      [
+        "2026-11-01",
+        "Jordan",
+        "In Progress",
+        "Bulb ordered"
+      ],
+      [
+        "2026-11-03",
+        "Jordan",
+        "Closed",
+        "Bulb replaced"
+      ]
+    ],
+    "screenshot": "query-09.png"
+  },
+  {
+    "number": 10,
+    "title": "10. Leases ending within 60 days of November 19, 2026",
+    "sql": "SELECT u.name AS resident, p.name AS property, h.unit_label, l.end_date\nFROM Lease AS l\nJOIN \"User\" AS u ON u.user_id = l.user_id\nJOIN Household AS h ON h.household_id = l.household_id\nJOIN Property AS p ON p.property_id = h.property_id\nWHERE l.end_date BETWEEN '2026-11-19' AND date('2026-11-19', '+60 days')\nORDER BY l.end_date;",
+    "columns": [
+      "resident",
+      "property",
+      "unit_label",
+      "end_date"
+    ],
+    "rows": [
+      [
+        "Riley",
+        "Oak Commons",
+        "3B",
+        "2026-12-15"
+      ],
+      [
+        "Mia",
+        "Cypress Apartments",
+        "2A",
+        "2026-12-31"
+      ]
+    ],
+    "screenshot": "query-10.png"
+  },
+  {
+    "number": 11,
+    "title": "11. Active monthly rent per unit as of November 19, 2026",
+    "sql": "SELECT p.name AS property, h.unit_label, COUNT(DISTINCT l.user_id) AS residents,\n    SUM(l.monthly_rent) AS total_rent\nFROM Lease AS l\nJOIN Household AS h ON h.household_id = l.household_id\nJOIN Property AS p ON p.property_id = h.property_id\nWHERE l.start_date <= '2026-11-19' AND l.end_date >= '2026-11-19'\nGROUP BY h.household_id, p.name, h.unit_label\nORDER BY p.name, h.unit_label;",
+    "columns": [
+      "property",
+      "unit_label",
+      "residents",
+      "total_rent"
+    ],
+    "rows": [
+      [
+        "Cypress Apartments",
+        "2A",
+        3,
+        1900.0
+      ],
+      [
+        "Oak Commons",
+        "3B",
+        1,
+        700.0
+      ]
+    ],
+    "screenshot": "query-11.png"
+  }
+]
