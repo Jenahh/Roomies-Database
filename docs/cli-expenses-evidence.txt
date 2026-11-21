@@ -1,0 +1,19 @@
+Demo email (e.g. alex@example.com or jordan@example.com):
+households
+household_id | property_id | unit_label | ra_user_id | property
+1 | 1 | 2A | 11 | Cypress Apartments
+
+properties
+(none)
+
+1 Households/properties  2 Add household (manager)  3 Delete EMPTY household (manager)
+4 Expenses  5 Announcements  6 Leases  7 Request history  Enter Quit
+Choose: Household ID:
+expenses
+id | title | totalAmount | amount | due | paidBy | settled | category | recurring | splitCount | canDelete
+1 | Internet bill | 60.0 | 20.0 | 2026-11-01 | Alex | 1 | Other | 0 | 3 | 1
+2 | Groceries | 45.0 | 15.0 | 2026-11-04 | Mia | 1 | Other | 0 | 3 | 0
+Enter View only | a Add | d Delete | p Mark your share paid/unpaid:
+1 Households/properties  2 Add household (manager)  3 Delete EMPTY household (manager)
+4 Expenses  5 Announcements  6 Leases  7 Request history  Enter Quit
+Choose:

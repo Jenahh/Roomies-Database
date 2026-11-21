@@ -22,3 +22,33 @@ Cypress Apartments | 2A | Leaking kitchen sink
 5. Taylor's open RA concerns
 property | unit_label | description
 Cypress Apartments | 2A | Roommate conflict over quiet hours
+
+6. Unpaid shares each resident owes in Household 1
+resident | amount_owed
+Sam | 35.0
+Mia | 20.0
+
+7. Total household spending in November 2026
+property | unit_label | total_spent
+Cypress Apartments | 2A | 105.0
+Oak Commons | 3B | 18.5
+
+8. Announcements for Household 1, newest first
+posted_at | posted_by | title
+2026-11-06 | Taylor | Fire drill
+2026-11-02 | Alex | Quiet hours
+
+9. Status history of the hallway light request
+updated_at | updated_by | new_status | note
+2026-11-01 | Jordan | In Progress | Bulb ordered
+2026-11-03 | Jordan | Closed | Bulb replaced
+
+10. Leases ending within 60 days of November 19, 2026
+resident | property | unit_label | end_date
+Riley | Oak Commons | 3B | 2026-12-15
+Mia | Cypress Apartments | 2A | 2026-12-31
+
+11. Active monthly rent per unit as of November 19, 2026
+property | unit_label | residents | total_rent
+Cypress Apartments | 2A | 3 | 1900.0
+Oak Commons | 3B | 1 | 700.0

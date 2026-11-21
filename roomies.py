@@ -188,10 +188,14 @@ def staff_menu(db, user_id, role):
             print("Choose a status from the menu.")
             continue
         with db:
-            report_change(db.execute("""
+            previous = db.execute("SELECT r.status FROM Request r WHERE r.request_id=? AND r.request_id IN (SELECT r.request_id " + scoped_requests + ")", (request_id,*params)).fetchone()
+            changed = db.execute("""
                 UPDATE Request SET status = ? WHERE request_id = ?
                 AND request_id IN (SELECT r.request_id
-            """ + scoped_requests + ")", (status, request_id, *params)))
+            """ + scoped_requests + ")", (status, request_id, *params))
+            report_change(changed)
+            if changed.rowcount and previous[0] != status:
+                db.execute("INSERT INTO RequestUpdate(request_id,updated_by_user_id,new_status,note,updated_at) VALUES(?,?,?,?,strftime('%Y-%m-%dT%H:%M:%fZ','now'))", (request_id,user_id,status,'Status updated through CLI'))
 
 
 def play(db):

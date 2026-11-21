@@ -1,0 +1,27 @@
+Roomies demo accounts
+user_id | name | role
+1 | Alex | resident
+2 | Mia | resident
+3 | Sam | resident
+4 | Riley | resident
+10 | Jordan | manager
+11 | Taylor | ra
+12 | Morgan | manager
+13 | Casey | ra
+Role (resident, manager, ra, or Enter to quit): User ID:
+Maintenance dashboard
+request_id | property | unit_label | description | status
+1 | Cypress Apartments | 2A | Leaking kitchen sink | Open
+5 | Cypress Apartments | 2A | Replace hallway light | Closed
+Request ID to update (Enter to go back):
+Roomies demo accounts
+user_id | name | role
+1 | Alex | resident
+2 | Mia | resident
+3 | Sam | resident
+4 | Riley | resident
+10 | Jordan | manager
+11 | Taylor | ra
+12 | Morgan | manager
+13 | Casey | ra
+Role (resident, manager, ra, or Enter to quit):
