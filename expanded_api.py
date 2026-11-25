@@ -3,6 +3,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 import re
 from request_api import RequestError
+from ledger_api import handle_ledger, member_id
 
 
 def text(value, label):
@@ -58,12 +59,18 @@ def handle_expanded(db, method, path, email, payload):
            JOIN Property p USING(property_id) LEFT JOIN HouseholdMember m USING(household_id)
            WHERE m.user_id=? OR p.manager_user_id=? OR h.ra_user_id=? ORDER BY household_id''', (user,user,user))]
         return {'households': households, 'properties': [dict(r) for r in db.execute('SELECT property_id,name FROM Property WHERE manager_user_id=?',(user,))]}
-    route = re.fullmatch(r'/api/database/households/([1-9]\d*)(?:/(expenses|announcements|leases|members)(?:/([1-9]\d*))?)?', path)
+    route = re.fullmatch(r'/api/database/households/([1-9]\d*)(?:/(expenses|announcements|leases|members|ledger)(?:/([1-9]\d*))?)?', path)
     if not route:
         raise RequestError(404, 'Unknown route.')
     household = int(route[1]); kind = route[2]; item = int(route[3]) if route[3] else None
     h = access(db,user,household)
     manager = h['manager_user_id'] == user
+    if kind == 'ledger':
+        if not h['member']:
+            raise RequestError(403, 'Only household residents access the expense ledger.')
+        if item is not None:
+            raise RequestError(404, 'Unknown ledger route.')
+        return handle_ledger(db, method, household, user, payload)
     if kind is None:
         if method != 'DELETE' or not manager:
             raise RequestError(403, 'Only the assigned manager can delete an empty household.')
@@ -87,6 +94,9 @@ def handle_expanded(db, method, path, email, payload):
                 raise RequestError(400,'The payer must belong to this household.')
             if total < len(selected):
                 raise RequestError(400,'The total must allow at least one cent per person.')
+            # Match the reused Roomies ledger's name-ID ordering for remainder cents.
+            names = {r['user_id']: member_id(r['name']) for r in db.execute('SELECT u.user_id,u.name FROM HouseholdMember m JOIN "User" u USING(user_id) WHERE household_id=?',(household,))}
+            selected = sorted(selected, key=lambda person: names[person].encode('utf-16-be'))
             expense = db.execute('INSERT INTO Expense(household_id,paid_by_user_id,description,amount,expense_date) VALUES(?,?,?,?,?)',
                  (household,payer,text(payload.get('title'),'an expense title'),total/100,day(payload.get('date')))).lastrowid
             for index, resident in enumerate(selected):
@@ -108,6 +118,7 @@ def handle_expanded(db, method, path, email, payload):
         return {'expenses':[dict(r) for r in db.execute('''SELECT CAST(e.expense_id AS TEXT) id,e.description title,e.amount totalAmount,
              COALESCE(es.share_amount,0) amount,e.expense_date due,u.name paidBy,
              COALESCE(es.is_paid,1) settled,'Other' category,0 recurring,
+             es.user_id IS NOT NULL hasShare,
              (SELECT COUNT(*) FROM ExpenseShare s WHERE s.expense_id=e.expense_id) splitCount,
              e.paid_by_user_id=? canDelete
              FROM Expense e JOIN "User" u ON u.user_id=e.paid_by_user_id

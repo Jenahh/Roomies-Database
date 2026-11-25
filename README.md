@@ -2,6 +2,39 @@
 
 This repository is the standalone CSC 4402 database project. It contains no copy of the React app. The separate CSC 4330 Roomies repository and its UI remain unchanged.
 
+## Public hosting preparation
+
+For the free Railway deployment, see [RAILWAY-SETUP.md](RAILWAY-SETUP.md).
+The Dockerfile builds the pinned Roomies interface and serves it with the Python
+API. The working SQLite database belongs on an attached `/data` volume. No public
+deployment is claimed until the generated HTTPS address has been tested.
+
+## Local browser preview (under review)
+
+The updated expense integration is prepared in `web/roomies`. Start with
+`python web_preview.py --frontend .\web\roomies` to reuse the current Roomies
+expense screen, backed by SQLite for bills, payments and monthly rules.
+Rebuild with `python prepare_roomies.py --source ..\roomies-github-current --database-expenses`.
+See [docs/EXPENSE-INTEGRATION.md](docs/EXPENSE-INTEGRATION.md) for added relations,
+scope, tests and report updates. The original Roomies source is unchanged.
+
+The `honors-local-preview` branch adds a browser alternative to the expanded CLI
+and can serve the existing Roomies build through the same Python server. It is
+not published or merged. Start with `python web_preview.py`, then open
+http://127.0.0.1:8080/demo/. See [LOCAL-PREVIEW.md](LOCAL-PREVIEW.md) for setup,
+demo accounts, test workflows, and the later hosting steps. No additional Python
+packages are required. The preview uses its own `demo-local-honors.sqlite3`;
+the original commands below still use `demo-local.sqlite3` unless you select the
+same filename explicitly. The report documents the earlier local interfaces
+and will need its interface section updated after the preview is finalized.
+
+The preview now uses one responsive mobile layout: Home embeds the existing
+Roomies screens. Residents have Home, Chores, Bills, Calendar, and Profile in
+the bottom bar; Details in the header contains additional database tools.
+The selected demo account is shared. The 4402-only embedding adapter uses the
+existing app's accessible controls and leaves its source/build files unchanged.
+See LOCAL-PREVIEW.md for phone-size review and adapter details.
+
 ## Requirements
 Python 3.8+; standard library only. No pip packages, emulator, or web app are needed for grading the CLI. Use `py` instead of `python` on Windows if needed.
 
@@ -48,7 +81,7 @@ The existing web chores, maintenance, and RA concern screens now use this folder
 The CSC4402 CLI works by itself; the separate web repository is optional and is not required to run this submission.
 
 ## Database design and supplied data
-15 tables: 14 enterprise relations plus ChoreDisplay (optional metadata for the existing chore screen). The five expanded enterprise tables are Expense, ExpenseShare, Announcement, RequestUpdate, Lease. ExpenseShare adds household_id and two composite foreign keys so a share must match both its expense household and a real household member. FK checks are enabled on every application connection.
+18 tables: the earlier 14 enterprise relations, optional ChoreDisplay, and the three expense extensions ExpenseDetail, ExpenseRecurrence and ExpensePayment. ExpenseShare adds household_id and two composite foreign keys so a share must match both its expense household and a real household member. FK checks are enabled on every application connection. expense_extensions.sql is part of initialization and the additive migration for older working files.
 
 The seed has 8 users, 2 properties, 2 households, 4 memberships, 5 chores, 5 requests, 3 expenses, 7 shares, 3 announcements, 3 history entries and 4 leases. User subtype tables allow overlapping roles (no disjointness or total-coverage constraint is asserted). ChoreDisplay starts empty and is populated when the web scheduler creates chores with metadata. Currency uses SQLite REAL with positive/nonnegative and two-decimal checks; API split arithmetic uses integer cents.
 
@@ -62,6 +95,11 @@ Query 11 includes only leases active on 2026-11-19 (inclusive start/end dates). 
 - queries.sql, sample-results.txt: eleven executable queries and results.
 - test_chore_api.py, test_expanded.py, verify_demo.py: regression and live HTTP/SQLite checks.
 - docs/: expanded E-R diagrams, editable report, PDF report, output figures and synchronization evidence.
+- web_preview.py, wsgi.py, web/: combined local/WSGI server and expanded browser forms.
+- prepare_roomies.py: build the separate existing app without changing its source; optionally export compiled files for a future upload.
+- test_web_preview.py, test_web_ui.mjs: combined-server persistence tests and browser-script workflow checks.
+- ledger_api.py, expense_extensions.sql, frontend/useHouseholdLedger.ts and build_database_frontend.mjs: relational ledger and isolated adapter build for the existing expense UI.
+- test_ledger_api.py, test_roomies_ledger.mjs: ledger transactions, permissions, and original Roomies settlement algorithms against SQLite.
 
 ## Submission review
 Fill in each teammate's actual contributions before submission. Verify the editable report's final pagination after your edits; the generated PDF is eight pages. Keep five main report queries; the six additional queries are supplementary. Confirm with the instructor if they prefer all eleven in the main report. Submit one final PDF and one code ZIP.

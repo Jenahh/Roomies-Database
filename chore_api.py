@@ -9,6 +9,7 @@ import re
 import sqlite3
 
 from expanded_api import handle_expanded
+from ledger_api import migrate_expenses
 from request_api import RequestError, handle_requests
 from roomies import connect, initialize
 
@@ -70,6 +71,55 @@ def create_chores(db, household, user, chores):
         db.execute("INSERT INTO ChoreDisplay VALUES (?, ?, ?)", (result.lastrowid, minutes, look))
 
 
+def dispatch_api(database, method, path, email, payload=None):
+    """Shared JSON contract for the original HTTP server and the hosted WSGI app.
+
+    Every mutation and its history entries commit together. Each call opens a
+    foreign-key-enabled connection, so neither web client bypasses CLI rules.
+    """
+    payload = {} if payload is None else payload
+    if not isinstance(payload, dict):
+        raise RequestError(400, "Expected a JSON object.")
+    with closing(connect(database)) as db, db:
+        db.row_factory = sqlite3.Row
+        if method != 'GET':
+            db.execute('BEGIN IMMEDIATE')
+        if path.startswith('/api/database/'):
+            result = handle_expanded(db, method, path, email, payload)
+        else:
+            requests = re.fullmatch(r"/api/requests/(resident|manager|ra)(?:/([1-9]\d*))?", path)
+            if requests:
+                result = handle_requests(db, method, requests[1],
+                                         int(requests[2]) if requests[2] else None,
+                                         email, payload)
+            else:
+                route = re.fullmatch(r"/api/households/([1-9]\d*)/chores(?:/([1-9]\d*))?", path)
+                if not route or method not in ('GET', 'POST', 'PATCH') or bool(route[2]) != (method == 'PATCH'):
+                    raise RequestError(404, "Unknown route.")
+                household = int(route[1])
+                member = db.execute(
+                    'SELECT u.user_id FROM HouseholdMember m JOIN "User" u USING (user_id) '
+                    'WHERE m.household_id = ? AND u.email = ?', (household, email)
+                ).fetchone()
+                if member is None:
+                    raise RequestError(403, "This demo account does not belong to that household.")
+                user = member['user_id']
+                if method == 'POST':
+                    create_chores(db, household, user, payload.get('chores'))
+                elif method == 'PATCH':
+                    completed = payload.get('completed')
+                    if type(completed) is not bool:
+                        raise RequestError(400, "Expected a completion status.")
+                    updated = db.execute(
+                        'UPDATE Chore SET status = ? WHERE chore_id = ? AND household_id = ?',
+                        ('Completed' if completed else 'Pending', int(route[2]), household),
+                    )
+                    if not updated.rowcount:
+                        raise RequestError(404, "Chore not found in this household.")
+                result = household_data(db, household, user)
+    return (201 if method == 'POST' else 200), result
+
+
 class ChoreAPI(BaseHTTPRequestHandler):
     def do_GET(self):
         self.handle_request()
@@ -94,60 +144,10 @@ class ChoreAPI(BaseHTTPRequestHandler):
 
     def handle_request(self):
         try:
-            if self.path.startswith('/api/database/'):
-                payload = self.read_payload() if self.command in ('POST','PATCH') else {}
-                with closing(connect(self.server.database)) as db, db:
-                    db.row_factory = sqlite3.Row
-                    if self.command != 'GET':
-                        db.execute('BEGIN IMMEDIATE')
-                    result = handle_expanded(db, self.command, self.path, self.headers.get('X-Roomies-Demo-Email'), payload)
-                self.reply(201 if self.command == 'POST' else 200, result)
-                return
-            requests = re.fullmatch(r"/api/requests/(resident|manager|ra)(?:/([1-9]\d*))?", self.path)
-            if requests:
-                payload = self.read_payload() if self.command != "GET" else {}
-                with closing(connect(self.server.database)) as db, db:
-                    db.row_factory = sqlite3.Row
-                    if self.command != "GET":
-                        db.execute("BEGIN IMMEDIATE")
-                    result = handle_requests(db, self.command, requests[1],
-                                             int(requests[2]) if requests[2] else None,
-                                             self.headers.get("X-Roomies-Demo-Email"), payload)
-                self.reply(201 if self.command == "POST" else 200, result)
-                return
-
-            route = re.fullmatch(r"/api/households/([1-9]\d*)/chores(?:/([1-9]\d*))?", self.path)
-            if not route or bool(route[2]) != (self.command == "PATCH"):
-                raise RequestError(404, "Unknown route.")
-            household = int(route[1])
-            with closing(connect(self.server.database)) as db, db:
-                db.row_factory = sqlite3.Row
-                if self.command != "GET":
-                    db.execute("BEGIN IMMEDIATE")
-                member = db.execute(
-                    'SELECT u.user_id FROM HouseholdMember m JOIN "User" u USING (user_id) '
-                    'WHERE m.household_id = ? AND u.email = ?',
-                    (household, self.headers.get("X-Roomies-Demo-Email")),
-                ).fetchone()
-                if member is None:
-                    raise RequestError(403, "This demo account does not belong to that household.")
-                user = member["user_id"]
-                if self.command != "GET":
-                    payload = self.read_payload()
-                    if self.command == "POST":
-                        create_chores(db, household, user, payload.get("chores"))
-                    else:
-                        completed = payload.get("completed")
-                        if type(completed) is not bool:
-                            raise RequestError(400, "Expected a completion status.")
-                        updated = db.execute(
-                            "UPDATE Chore SET status = ? WHERE chore_id = ? AND household_id = ?",
-                            ("Completed" if completed else "Pending", int(route[2]), household),
-                        )
-                        if not updated.rowcount:
-                            raise RequestError(404, "Chore not found in this household.")
-                snapshot = household_data(db, household, user)
-            self.reply(201 if self.command == "POST" else 200, snapshot)
+            payload = self.read_payload() if self.command in ('POST', 'PATCH') else {}
+            status, result = dispatch_api(self.server.database, self.command, self.path,
+                                          self.headers.get('X-Roomies-Demo-Email'), payload)
+            self.reply(status, result)
         except RequestError as error:
             self.reply(error.status, {"error": str(error)})
         except (ValueError, TypeError, OverflowError):
@@ -169,6 +169,12 @@ class ChoreAPI(BaseHTTPRequestHandler):
 
 def prepare_database(path):
     with closing(connect(path)) as db, db:
+        if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ExpensePayment'").fetchone() is None:
+            backup = Path(path).with_name(Path(path).stem+'-before-ledger.sqlite3')
+            if not backup.exists():
+                with closing(sqlite3.connect(backup)) as saved:
+                    db.backup(saved)
+        migrate_expenses(db)
         db.execute(
             "CREATE TABLE IF NOT EXISTS ChoreDisplay ("
             "chore_id INTEGER PRIMARY KEY REFERENCES Chore(chore_id) ON DELETE CASCADE, "

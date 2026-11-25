@@ -22,7 +22,8 @@ def initialize(path):
         with closing(connect(path)) as db:
             schema = (ROOT / "schema.sql").read_text(encoding="utf-8")
             seed = (ROOT / "seed.sql").read_text(encoding="utf-8")
-            db.executescript("BEGIN;\n" + schema + "\n" + seed + "\nCOMMIT;")
+            extensions = (ROOT / "expense_extensions.sql").read_text(encoding="utf-8")
+            db.executescript("BEGIN;\n" + schema + "\n" + extensions + "\n" + seed + "\nCOMMIT;")
     except BaseException:
         path.unlink()
         raise

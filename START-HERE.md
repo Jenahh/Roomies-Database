@@ -1,5 +1,18 @@
 # Test the local CSC 4402 version
 
+Public hosting preparation: [RAILWAY-SETUP.md](RAILWAY-SETUP.md) explains the
+single-service deployment, persistent SQLite volume, free-plan limits, and
+public acceptance checks. Local commands below remain available.
+
+For the NEW browser preview, run `python web_preview.py` and open
+http://127.0.0.1:8080/demo/. It serves both the existing Roomies build and the
+expanded database forms. See [LOCAL-PREVIEW.md](LOCAL-PREVIEW.md) for a short
+test plan. This is local-only on `honors-local-preview`; nothing is published.
+
+The original CLI and separate Vite/API workflow follows below. Its default
+database filename differs from the new preview: use `--db
+demo-local-honors.sqlite3` with the CLI to share the new preview's data.
+
 This is the CSC 4402 database project. No changes were made to the separate CSC 4330 app.
 
 1. Open this folder in VS Code.

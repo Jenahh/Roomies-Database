@@ -1,0 +1,2 @@
+# Only the hosted server needs this package. Local preview and CLI remain stdlib.
+gunicorn==27.0.1

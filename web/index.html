@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FAF9F6">
+  <title>Roomies · Your household</title>
+  <link rel="icon" type="image/png" href="/demo/roomies-logo.png">
+  <link rel="stylesheet" href="/demo/demo.css">
+  <script type="module" src="/demo/demo.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" id="open-roomies" href="#home" aria-label="Roomies home"><img class="brand-logo" src="/demo/roomies-logo.png" alt="" width="38" height="38">Roomies</a>
+      <button class="details-shortcut" id="details-shortcut" type="button" data-experience="more" aria-label="Household details and additional tools" title="Announcements, requests, leases and household records"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13H3Zm6 0v-6h6v6M7 10h2m6 0h2"/></svg><span>Details</span></button>
+      <a class="account-shortcut" href="#account-settings" id="account-shortcut"><span id="account-avatar" aria-hidden="true">A</span><span id="account-name">Your household</span><svg width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="m1 1 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+    </header>
+    <details class="account-drawer" id="account-settings">
+      <summary><span>Demo account &amp; household</span><span class="small">Switch person</span></summary>
+      <section class="context-card" aria-label="Demo account and household">
+        <div class="field"><label for="account">Demo account</label><select id="account" disabled><option>Loading accounts…</option></select></div>
+        <div class="field"><label for="household">Household</label><select id="household" disabled><option>Loading households…</option></select></div>
+        <button class="button secondary" type="button" id="refresh" disabled>Refresh data</button>
+        <p id="role-description" class="small">Connecting to your household…</p>
+        <p class="small demo-disclosure">Shared fictional accounts for a classroom demo.</p>
+      </section>
+    </details>
+    <div id="message" role="status" aria-live="polite" hidden></div>
+    <main class="shell">
+      <section id="app-panel" aria-label="Roomies app">
+        <p id="app-status" class="app-status" role="status">Getting your Roomies home ready…</p>
+        <iframe id="roomies-frame" title="Roomies home, chores, calendar and profile" src="about:blank" hidden></iframe>
+      </section>
+      <section id="more-panel" hidden>
+        <div class="section-heading"><div><p class="eyebrow">A little more about your home</p><h1>Household details</h1><p>Announcements, support history, and household records.</p></div></div>
+        <div class="more-grid tabs" aria-label="Additional household information">
+          <button type="button" data-feature="announcements"><span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 10 15-5v14L4 14v-4Zm3 5 2 6h3l-2-5"/></svg></span><span><strong>Announcements</strong><small>News and reminders for your household</small></span></button>
+          <button type="button" data-feature="requests"><span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v13H9l-5 4V4Zm4 5h8m-8 4h5"/></svg></span><span><strong>Requests &amp; history</strong><small>Maintenance, RA concerns, and saved updates</small></span></button>
+          <button type="button" data-feature="households"><span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9m-9 12v-7h4v7"/></svg></span><span><strong>Households</strong><small>View units and manage empty households</small></span></button>
+          <button type="button" data-feature="leases"><span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5V3Zm9 0v5h5M9 12h6m-6 4h6"/></svg></span><span><strong>Leases</strong><small>Rent, residents and lease dates</small></span></button>
+        </div>
+        <details class="project-info"><summary>About this demonstration</summary><p>Roomies helps residents share chores, bills, and household updates. These additional tools show household records and request history.</p><p>Shared chores, bills, posts, leases, and requests are saved to the database. Calendar and personal preferences stay on this browser. The submitted project also includes terminal menus for the same database operations.</p></details>
+      </section>
+      <section id="tools-panel" hidden><section id="workspace" aria-live="polite" aria-busy="true"><div class="empty"><h2>Getting things ready…</h2><p>Your household records will appear here.</p></div></section></section>
+      <noscript>This demonstration needs JavaScript enabled to load and edit records.</noscript>
+    </main>
+    <nav class="main-nav tabs" aria-label="Roomies navigation">
+      <button type="button" data-experience="home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Home</span></button>
+      <button type="button" id="primary-task" data-app-tab="Chores"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span id="primary-task-label">Chores</span></button>
+      <button type="button" data-feature="expenses"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2V3Zm4 5h6m-6 4h6"/></svg><span>Bills</span></button>
+      <button type="button" data-app-tab="Calendar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4V5Zm0 5h16M8 3v5m8-5v5"/></svg><span>Calendar</span></button>
+      <button type="button" data-app-tab="Profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg><span>Profile</span></button>
+    </nav>
+  </div>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <h2 id="confirm-title">Delete this record?</h2><p id="confirm-description"></p>
+    <form method="dialog"><button class="button secondary" value="cancel">Keep it</button><button class="button danger" value="delete">Delete record</button></form>
+  </dialog>
+</body>
+</html>

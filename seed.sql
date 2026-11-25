@@ -50,3 +50,8 @@ INSERT INTO Lease VALUES
     (2, 1, 2, '2026-08-01', '2026-12-31', 650.00),
     (3, 1, 3, '2026-08-01', '2027-05-31', 600.00),
     (4, 2, 4, '2026-08-01', '2026-12-15', 700.00);
+
+INSERT INTO ExpenseDetail VALUES
+    (1, 'expense:1', 'Internet', 1),
+    (2, 'expense:2', 'Groceries', 2),
+    (3, 'expense:3', 'Other', 4);
