@@ -1,9 +1,9 @@
-# Expense integration: local review addendum
+# Expense integration: relational ledger
 
 The isolated CSC4402 build now reuses Roomies' ExpensesScreen, balance cards,
 monthly-bill controls, and settle-up assistant. A replacement ledger hook sends
 the same component's changes to SQLite. The original app checkout and its normal
-build are unchanged. This is not published or merged.
+build are unchanged. The integrated version is published from honors-public-demo; dev remains unchanged.
 
 ## Start the integrated build
 
@@ -99,31 +99,23 @@ upgrade. Existing expense/share rows are preserved. The main supplied database
 contains the expanded schema and original seed rows; recurrence/payment tables
 start empty and are populated when those workflows are demonstrated.
 
-## Verification and report updates
+## Verification and report evidence
 
-```powershell
-python -m unittest discover -v
-node test_web_ui.mjs
-node test_roomies_ledger.mjs
-python roomies.py test
-python verify_demo.py
-```
+The refreshed report includes the three relations, panel E, and current browser
+illustrations. Full-size captures are under current-web-screenshots/. These are
+local replays of the deployed build; public API/restart results are recorded
+separately in public-verification.json.
 
-The native-ledger check runs the actual Roomies financial algorithms against a
-temporary live HTTP/SQLite server. A $10 monthly bill split among Alex, Mia and
-Sam produces $3.34 / $3.33 / $3.33 each month. Over October–December the balances
-are +$19.98 / -$9.99 / -$9.99. The assistant proposes two $9.99 payments; recording
-them gives zero balances. Undoing a payment restores a debt. Stopping the rule
-after November leaves two occurrences through June of the next year.
+Run python -m unittest discover -v, python roomies.py test, and python verify_demo.py.
+Optional Node checks are node test_web_ui.mjs and node test_roomies_ledger.mjs;
+the latter requires the original frontend checkout's TypeScript dependency.
 
-These checks are not a visual browser/device test. Review the enlarged screens,
-expense modals, and prominent Details button in the local preview.
+The native-ledger check runs the existing Roomies finance algorithms against a
+temporary HTTP/SQLite server. A $10 monthly bill split among Alex, Mia and Sam
+produces $3.34 / $3.33 / $3.33 each month. October-December balances are
++$19.98 / -$9.99 / -$9.99; two $9.99 transfers settle them. Undo restores debt;
+stopping recurrence after November leaves two monthly occurrences.
 
-Before submitting the final report, add the three relations and their E-R panel,
-replace the older expense-interface description/illustration with the reused
-Roomies screen, and explain recurring rules and net transfers as above. The
-existing PDF/DOCX has not been silently rewritten during this local preview.
-The original five main queries and six supplemental seed results remain valid
-for their supplied data; additional expense checks are executable in the test
-files. Query 6 describes individual unpaid-share flags, not the new net balance;
-clarify that wording if showing it beside the richer expense screen.
+The five main queries and six supplementary seed outcomes remain reproducible.
+Query 6 describes unpaid individual share flags; ExpensePayment transfers are
+included in the richer web ledger's net balance, not subtracted by that query.

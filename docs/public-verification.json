@@ -1,0 +1,23 @@
+{
+  "base": "https://roomies-web-production.up.railway.app",
+  "bill": "hosting-890948fd3a5149f988a47aaeaea81941",
+  "payment": {
+    "id": "hosting-890948fd3a5149f988a47aaeaea81941-payment",
+    "from": "name:mia",
+    "to": "name:alex",
+    "amountCents": 333,
+    "date": "2026-11-24"
+  },
+  "checks": [
+    "Public HTTPS, interface assets, SQL expense build, private database files and household/origin checks",
+    "Chore update shared between residents; initial status restored",
+    "Maintenance and RA status/history synchronized across resident and staff accounts",
+    "Household insert and delete persisted across independent HTTP reads",
+    "Native expense contract: new bill, monthly rule, payment and stale-write protection",
+    "Bill, payment and monthly rule survived Railway container restart",
+    "Payment undo and bill deletion after restart; financial fixtures removed"
+  ],
+  "deployment_id": "c081a69c-9ec4-4f5f-99f9-22c6a1b15baf",
+  "commit": "05153a128799abe473140efd56d928aa37bb7349",
+  "result": "PASS"
+}
